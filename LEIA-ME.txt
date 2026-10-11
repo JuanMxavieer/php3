@@ -1,0 +1,30 @@
+FalaQ Base - Pacote integrado dos Tickets #001 a #012
+
+Este pacote reúne os arquivos em seus caminhos Laravel finais. Não há snippets de rotas/controladores separados: routes/web.php, EventoController.php, PerguntaController.php e a view já estão conectados entre si.
+
+Conteúdo principal:
+- app/Http/Requests/StorePerguntaRequest.php: validação do texto e evento.
+- app/Models/Pergunta.php e app/Models/User.php: relacionamentos N:1 e N:M.
+- app/Http/Controllers/EventoController.php: criação de pergunta, listagem filtrada por evento, apenas públicas, eager loading, contagem e ranking por votos, paginação e exclusão autorizada.
+- app/Http/Controllers/PerguntaController.php: alternância de voto com toggle().
+- app/Policies/PerguntaPolicy.php: somente autor da pergunta ou dono do evento pode excluir.
+- resources/views/eventos/show.blade.php: formulário com validação e old(), cartões, votos, botão de exclusão autorizado e paginação.
+- resources/views/components/danger-button.blade.php: botão de exclusão.
+- database/migrations/2026_10_11_000001_create_pergunta_user_table.php: tabela pivot e unique composto.
+- routes/web.php: rotas de eventos, autenticação, envio de pergunta, voto e exclusão.
+
+Como aplicar:
+1. Faça backup do projeto e compare os arquivos antes de substituir. Este pacote inclui um routes/web.php completo baseado no routes/web.php público do repositório-base, então substitua o seu somente se ele ainda tiver essa mesma estrutura; caso tenha rotas adicionais, mescle-as.
+2. Copie as pastas app/, database/, resources/ e routes/ para a raiz do projeto Laravel.
+3. Confira que EventoFormRequest, Evento, LoginController e RegisterController existem no projeto original.
+4. Confira se a tabela perguntas possui as colunas evento_id, user_id, texto, status e is_public; e se eventos possui user_id.
+5. Confira que a coluna is_public é false por padrão para novas perguntas e que há um fluxo de moderação para aprová-las.
+6. Execute php artisan migrate.
+7. Execute php artisan route:list e php artisan test --filter=UpvotePerguntaTest.
+
+Notas importantes:
+- A listagem pública usa where('is_public', true), with('user'), withCount('votos'), withExists() e paginate(10). withExists() requer uma versão recente do Laravel.
+- A policy é descoberta automaticamente em versões atuais do Laravel. Se seu projeto tiver registro manual de policies, registre App\Models\Pergunta => App\Policies\PerguntaPolicy.
+- O CSS combina classes Bootstrap existentes no projeto com classes Tailwind solicitadas nos tickets. Para as classes Tailwind funcionarem visualmente, Tailwind precisa estar configurado no projeto.
+- A migration foi criada, mas não executa migrate automaticamente. Rode o comando no seu ambiente.
+- O pacote não foi executado contra uma instalação completa do projeto; revise a compatibilidade com a versão do Laravel e rode os testes antes de entregar.
